@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: task-planner
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    # Render sets PORT automatically; Spring Boot reads it via ${PORT:8080}
+    healthCheckPath: /tasks
+    envVars:
+      - key: DB_HOST
+        fromDatabase:
+          name: task-planner-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: task-planner-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: task-planner-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: task-planner-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: task-planner-db
+          property: password
+
+databases:
+  - name: task-planner-db
+    databaseName: task_planner_db
+    plan: free

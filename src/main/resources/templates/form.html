@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${pageTitle} + ' – Task Planner'">Task Form – Task Planner</title>
+    <meta name="description" content="Create or edit a task in Task Planner."/>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body class="page-wrapper">
+
+<!-- ══ NAVBAR ══════════════════════════════════════════════════════════════ -->
+<nav class="navbar">
+    <div class="container navbar-inner">
+        <a href="/tasks" class="navbar-brand">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+            </svg>
+            Task Planner
+        </a>
+        <div class="navbar-actions">
+            <a href="/tasks" class="btn btn-white">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                </svg>
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- ══ MAIN ════════════════════════════════════════════════════════════════ -->
+<main class="main-content">
+    <div class="container">
+
+        <div class="form-card">
+
+            <!-- Card header -->
+            <div class="form-card-header">
+                <h1 th:text="${pageTitle}">Task</h1>
+                <p th:if="${task.id == null}">Fill in the details below to create a new task.</p>
+                <p th:if="${task.id != null}">
+                    Update the details for task
+                    <code style="background:rgba(255,255,255,.2);padding:1px 6px;border-radius:4px;font-size:.8em"
+                          th:text="${task.id}"></code>
+                </p>
+            </div>
+
+            <!-- Card body -->
+            <div class="form-card-body">
+
+                <!-- Error banner -->
+                <div th:if="${errorMsg}" class="alert alert-danger" style="margin-bottom:20px">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                         stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a1 1 0 00.87 1.5h18.62a1 1 0 00.87-1.5L13.71 3.86a2 2 0 00-3.42 0z"/>
+                    </svg>
+                    <span th:text="${errorMsg}"></span>
+                </div>
+
+                <form id="task-form" th:action="${formAction}" th:object="${task}" method="post"
+                      novalidate>
+
+                    <!-- Title -->
+                    <div class="form-group">
+                        <label class="form-label" for="title">Title <span style="color:var(--red-500)">*</span></label>
+                        <input id="title" type="text" class="form-control"
+                               th:field="*{title}"
+                               th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''"
+                               placeholder="e.g. Design landing page"
+                               maxlength="255"/>
+                        <div th:if="${#fields.hasErrors('title')}" class="form-error-msg">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                 stroke="currentColor" stroke-width="2" style="width:14px;height:14px">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>
+                            <span th:errors="*{title}"></span>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label class="form-label" for="description">Description</label>
+                        <textarea id="description" class="form-control"
+                                  th:field="*{description}"
+                                  placeholder="Optional: describe this task in more detail…"></textarea>
+                    </div>
+
+                    <!-- Due Date / Priority row -->
+                    <div class="form-row">
+                        <div class="form-group" style="margin-bottom:0">
+                            <label class="form-label" for="dueDate">Due Date <span style="color:var(--red-500)">*</span></label>
+                            <input id="dueDate" type="date" class="form-control"
+                                   th:field="*{dueDate}"
+                                   th:classappend="${#fields.hasErrors('dueDate')} ? 'is-invalid' : ''"/>
+                            <div th:if="${#fields.hasErrors('dueDate')}" class="form-error-msg">
+                                <span th:errors="*{dueDate}"></span>
+                            </div>
+                            <div class="form-hint">Past dates are accepted.</div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom:0">
+                            <label class="form-label" for="priority">Priority <span style="color:var(--red-500)">*</span></label>
+                            <select id="priority" class="form-select"
+                                    th:field="*{priority}"
+                                    th:classappend="${#fields.hasErrors('priority')} ? 'is-invalid' : ''">
+                                <option value="">— Select priority —</option>
+                                <option th:each="p : ${priorities}"
+                                        th:value="${p.name()}"
+                                        th:text="${p.name()}">
+                                </option>
+                            </select>
+                            <div th:if="${#fields.hasErrors('priority')}" class="form-error-msg">
+                                <span th:errors="*{priority}"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="form-group" style="margin-top:18px">
+                        <label class="form-label" for="status">Status <span style="color:var(--red-500)">*</span></label>
+                        <select id="status" class="form-select"
+                                th:field="*{status}"
+                                th:classappend="${#fields.hasErrors('status')} ? 'is-invalid' : ''">
+                            <option value="">— Select status —</option>
+                            <option th:each="s : ${statuses}"
+                                    th:value="${s.name()}"
+                                    th:text="${#strings.replace(s.name(),'_',' ')}">
+                            </option>
+                        </select>
+                        <div th:if="${#fields.hasErrors('status')}" class="form-error-msg">
+                            <span th:errors="*{status}"></span>
+                        </div>
+                    </div>
+
+                    <!-- Form actions -->
+                    <div class="form-actions">
+                        <a href="/tasks" class="btn btn-ghost" id="cancel-btn">Cancel</a>
+                        <button type="submit" class="btn btn-primary" id="save-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                 stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span th:text="${task.id == null} ? 'Create Task' : 'Save Changes'">Save</span>
+                        </button>
+                    </div>
+
+                </form>
+            </div><!-- /form-card-body -->
+        </div><!-- /form-card -->
+
+    </div><!-- /container -->
+</main>
+
+<!-- ══ FOOTER ══════════════════════════════════════════════════════════════ -->
+<footer class="footer">
+    Task Planner
+</footer>
+
+</body>
+</html>
