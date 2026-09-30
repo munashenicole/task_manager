@@ -8,11 +8,10 @@ A full-stack task management web application built with **Java 21 · Spring Boot
 
 | Item | Detail |
 |---|---|
-| **URL** | _Add your Render URL here after deployment e.g. `https://task-planner-xxxx.onrender.com`_ |
+| **URL** | https://task-planner-64ey.onrender.com |
 | **Login required** | ❌ No authentication — the app is publicly accessible |
 | **Demo note** | Data is shared; feel free to create, edit, and delete tasks |
 
-> **Note for markers:** The deployed version matches this submitted source exactly. Data persists across restarts via a Render-hosted PostgreSQL database (free tier, 90-day limit from deployment date).
 
 ---
 
@@ -86,51 +85,12 @@ mvn test -pl . --no-transfer-progress
 
 **Expected output:**
 ```
-Tests run: 25, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 33, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
 > Tests do **not** require a running PostgreSQL instance. H2 is used automatically.
 
----
-
-## Deploying to Render
-
-### Step-by-step
-
-1. **Push your code to GitHub** (or GitLab/Bitbucket).
-
-2. **Go to [render.com](https://render.com)** → Sign up / Log in.
-
-3. **Create services via Blueprint (recommended):**
-   - Click **New → Blueprint**
-   - Connect your GitHub repository
-   - Render reads `render.yaml` and automatically creates:
-     - A **Web Service** (Docker, free tier)
-     - A **PostgreSQL database** (`task-planner-db`, free tier)
-   - Click **Apply**
-
-4. **Manual setup (alternative):**
-   - Create a **PostgreSQL** instance named `task-planner-db`
-   - Create a **Web Service** → choose Docker → connect your repo
-   - Add these environment variables (copy values from the DB dashboard):
-     ```
-     DB_HOST       → from Render DB → Hostname
-     DB_PORT       → from Render DB → Port
-     DB_NAME       → task_planner_db
-     DB_USER       → from Render DB → Username
-     DB_PASSWORD   → from Render DB → Password
-     ```
-
-5. **Wait for build** (~3–5 minutes on first deploy). Render will:
-   - Pull your code
-   - Build the Docker image (Maven compiles the JAR)
-   - Start the container
-   - Hibernate auto-creates the `tasks` table on first boot
-
-6. **Your app is live** at `https://<service-name>.onrender.com`
-
-> ⚠️ **Free tier note:** Render free web services spin down after 15 minutes of inactivity. The first request after sleep takes ~30 seconds to wake up. The PostgreSQL free instance expires after 90 days.
 
 ---
 
